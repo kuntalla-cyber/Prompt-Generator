@@ -3,7 +3,7 @@ import google.generativeai as genai
 
 # --- 1. SETTING API ---
 # Masukkan API Key Anda di bawah ini
-API_KEY = "AIzaSyBdor4GvP-NF7u2-EBUgy5BsrJATso..." 
+API_KEY = "AIzaSyBdor4GvP-NF7u2-EBUgy5BsrJATsdfrK0" 
 
 try:
     genai.configure(api_key=API_KEY)
