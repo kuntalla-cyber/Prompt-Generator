@@ -1,0 +1,3 @@
+# Prompt-Generastreamlit
+google-generativeai
+tor
