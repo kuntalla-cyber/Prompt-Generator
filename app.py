@@ -6,7 +6,7 @@ import google.generativeai as genai
 API_KEY = "AIzaSyBdor4GvP-NF7u2-EBUgy5BsrJATsdfrK0" 
 
 genai.configure(api_key=API_KEY)
-model = genai.GenerativeModel('gemini-1.5-flash')
+model = genai.GenerativeModel('gemini-pro')
 
 st.set_page_config(page_title="Prompt Architect", layout="centered")
 
