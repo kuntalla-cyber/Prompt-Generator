@@ -1,59 +1,41 @@
 import streamlit as st
 import google.generativeai as genai
 
-# --- 1. KONFIGURASI API ---
-# Pastikan API Key Anda benar di dalam tanda petik
-API_KEY = "AIzaSyBdor4GvP-NF7u2-EBUgy5BsrJATsdfrK0" 
+# --- 1. SETTING API ---
+# Masukkan API Key Anda di bawah ini
+API_KEY = "AIzaSyBdor4GvP-NF7u2-EBUgy5BsrJATso..." 
 
 try:
     genai.configure(api_key=API_KEY)
-    # Menggunakan model paling stabil untuk aplikasi web
-    model_ai = genai.GenerativeModel('gemini-1.5-flash-latest')
+    # GANTI KE PRO 1.0: Ini model paling stabil untuk akun gratis
+    model = genai.GenerativeModel('gemini-1.0-pro')
 except Exception as e:
-    st.error(f"Gagal konfigurasi API: {e}")
+    st.error(f"Error Config: {e}")
 
-# --- 2. SETTING HALAMAN ---
-st.set_page_config(page_title="Prompt Architect Pro", layout="centered")
-st.header("🎬 AI Script Generator")
-st.write("Profesional Tool untuk Alur Konten Otomatis")
+# --- 2. TAMPILAN ---
+st.set_page_config(page_title="Generator Naskah", layout="centered")
+st.title("🎬 Script Generator Profesional")
 
-# --- 3. INPUT USER ---
-ide_user = st.text_area("Masukan Ide Adegan:", placeholder="Contoh: Iklan sepatu lari yang energik...")
-tombol_proses = st.button("Generate Alur Lengkap", use_container_width=True)
+ide_konten = st.text_input("Ide Adegan:", placeholder="Contoh: Iklan sepatu lari")
 
-# --- 4. LOGIKA GENERATOR ---
-if tombol_proses:
-    if not ide_user:
-        st.warning("Mohon masukkan ide terlebih dahulu.")
-    else:
-        with st.spinner("Engineering sedang bekerja merancang naskah..."):
-            perintah = f"""
-            Bertindaklah sebagai Senior Creative Director & Copywriter.
-            Kembangkan ide ini: '{ide_user}' menjadi naskah produksi lengkap.
-            
-            Wajib sertakan:
-            - ADEGAN 1-3 (Detail Visual & Audio)
-            - PROMPT GAMBAR/VIDEO (Expanded untuk AI Generator)
-            - CTA (Call to Action yang persuasif)
-            """
+if st.button("Generate Sekarang"):
+    if ide_konten:
+        with st.spinner("Sedang merancang alur..."):
             try:
-                # Menggunakan model_ai yang sudah didefinisikan di atas
-                respon = model_ai.generate_content(perintah)
-                st.session_state['hasil_akhir'] = respon.text
+                # Perintah singkat & padat
+                perintah = f"Buat naskah video lengkap berdurasi 30 detik untuk ide: {ide_konten}. Sertakan adegan visual dan teks narasi."
+                response = model.generate_content(perintah)
+                
+                # Menampilkan hasil langsung di layar
+                st.markdown("### Hasil Naskah:")
+                st.write(response.text)
+                st.session_state['hasil'] = response.text
             except Exception as e:
-                st.error(f"Terjadi kesalahan teknis: {e}")
+                # Jika error lagi, ini akan memberitahu kita ALASAN ASLINYA
+                st.error(f"Sistem Google Menjawab: {e}")
+    else:
+        st.warning("Silakan isi ide terlebih dahulu.")
 
-# --- 5. OUTPUT & EDITING ---
-if 'hasil_akhir' in st.session_state:
-    st.markdown("---")
-    st.subheader("Draft Naskah (Silakan Edit Jika Perlu):")
-    # Fitur editing sesuai permintaan Anda
-    teks_edit = st.text_area("Editor:", value=st.session_state['hasil_akhir'], height=450)
-    
-    col1, col2 = st.columns(2)
-    with col1:
-        st.download_button("Download Script (.txt)", teks_edit, file_name="naskah_produksi.txt")
-    with col2:
-        if st.button("Clear Canvas"):
-            del st.session_state['hasil_akhir']
-            st.rerun()
+# Tombol simpan
+if 'hasil' in st.session_state:
+    st.download_button("Simpan Naskah (.txt)", st.session_state['hasil'], file_name="naskah.txt")
