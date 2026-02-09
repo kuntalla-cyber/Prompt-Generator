@@ -1,41 +1,44 @@
 import streamlit as st
 import google.generativeai as genai
 
-# --- 1. SETTING API ---
-# Masukkan API Key Anda di bawah ini
-API_KEY = "AIzaSyBdor4GvP-NF7u2-EBUgy5BsrJATsdfrK0" 
+# --- 1. KONFIGURASI API ---
+# Gunakan API Key yang sudah Anda buat
+API_KEY = "AIzaSyCq_O6SR9whuc8sFj0Wp_1jyfoh31VyBa4" 
+
+if API_KEY.startswith(" "):
+    API_KEY = API_KEY.strip()
 
 try:
     genai.configure(api_key=API_KEY)
-    # GANTI KE PRO 1.0: Ini model paling stabil untuk akun gratis
-    model = genai.GenerativeModel('gemini-1.0-pro')
+    model = genai.GenerativeModel('gemini-1.5-flash')
 except Exception as e:
-    st.error(f"Error Config: {e}")
+    st.error(f"Gagal konfigurasi: {e}")
 
-# --- 2. TAMPILAN ---
-st.set_page_config(page_title="Generator Naskah", layout="centered")
-st.title("🎬 Script Generator Profesional")
+# --- 2. TAMPILAN APLIKASI ---
+st.set_page_config(page_title="Script Generator", layout="centered")
+st.title("🎬 AI Script Generator")
+st.write("Ubah ide Anda menjadi naskah profesional.")
 
-ide_konten = st.text_input("Ide Adegan:", placeholder="Contoh: Iklan sepatu lari")
+# Input ide dari pengguna
+ide = st.text_area("Ide Adegan:", placeholder="Contoh: Iklan sepatu bola yang keren")
 
+# Tombol untuk menjalankan
 if st.button("Generate Sekarang"):
-    if ide_konten:
-        with st.spinner("Sedang merancang alur..."):
+    if ide:
+        with st.spinner("Sedang memproses naskah..."):
             try:
-                # Perintah singkat & padat
-                perintah = f"Buat naskah video lengkap berdurasi 30 detik untuk ide: {ide_konten}. Sertakan adegan visual dan teks narasi."
-                response = model.generate_content(perintah)
+                # Perintah ke AI
+                response = model.generate_content(f"Buat naskah video lengkap untuk ide: {ide}")
                 
-                # Menampilkan hasil langsung di layar
-                st.markdown("### Hasil Naskah:")
+                # Menampilkan hasil
+                st.subheader("Hasil Naskah:")
                 st.write(response.text)
                 st.session_state['hasil'] = response.text
             except Exception as e:
-                # Jika error lagi, ini akan memberitahu kita ALASAN ASLINYA
                 st.error(f"Sistem Google Menjawab: {e}")
     else:
-        st.warning("Silakan isi ide terlebih dahulu.")
+        st.warning("Masukkan ide terlebih dahulu!")
 
-# Tombol simpan
+# Tombol simpan hasil
 if 'hasil' in st.session_state:
     st.download_button("Simpan Naskah (.txt)", st.session_state['hasil'], file_name="naskah.txt")
