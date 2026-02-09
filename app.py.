@@ -1,0 +1,34 @@
+import streamlit as st
+import google.generativeai as genai
+
+# Setup Halaman
+st.set_page_config(page_title="Prompt Gen Pro", layout="centered")
+
+# Masukkan API Key Anda di sini
+API_KEY = "AIzaSyBdor4GvP-NF7u2-EBUgy5BsrJATsdfrK0" 
+
+genai.configure(api_key=API_KEY)
+model = genai.GenerativeModel('gemini-1.5-flash')
+
+st.title("🚀 Auto-Prompt Generator")
+st.write("Ubah ide singkat menjadi script iklan/konten lengkap.")
+
+# Input User
+ide = st.text_input("Ketik ide adegan 1:", placeholder="Contoh: Pria minum kopi di pagi hari")
+
+if st.button("Generate Alur & Script"):
+    if ide:
+        with st.spinner("Sedang merancang..."):
+            prompt_logic = f"Ubah ide ini: '{ide}' menjadi penjabaran luas: Adegan 1, 2, 3, script visual, audio, dan CTA jualan yang powerfull."
+            response = model.generate_content(prompt_logic)
+            st.session_state['hasil'] = response.text
+    else:
+        st.error("Isi dulu idenya!")
+
+# Tampilkan Hasil & Opsi Edit
+if 'hasil' in st.session_state:
+    st.subheader("Hasil Rancangan (Bisa Anda Edit):")
+    # Area teks yang bisa diedit user
+    teks_final = st.text_area("Edit jika kurang sesuai:", value=st.session_state['hasil'], height=400)
+    
+    st.download_button("Download Script (.txt)", teks_final, file_name="script.txt")
